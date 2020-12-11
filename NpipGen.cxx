@@ -32,10 +32,9 @@ int main(int argc, char *argv[]) {
 
 #ifdef PLOTS
   TH1D *W_hist = new TH1D("w", "w", 500, 0.0, energy);
-  TH1D *W_rad = new TH1D("w_rad", "w_rad", 500, 0.0, energy);
+  TH1D *missMass = new TH1D("MM", "MM", 500, 0.0, energy);
 
   TH2D *WvsQ2 = new TH2D("wvsq2", "wvsq2", 500, 0.0, energy, 500, q2_min, q2_max);
-  TH2D *WvsQ2_rad = new TH2D("wvsq2_rad", "wvsq2_rad", 500, 0.0, energy, 500, q2_min, q2_max);
 #endif
 
   std::ofstream myfile(file_name);
@@ -45,17 +44,17 @@ int main(int argc, char *argv[]) {
   TLorentzVector cms = beam + target;
 
   //(Momentum, Energy units are Gev/C, GeV)
-  Double_t masses[2] = {MASS_E, MASS_P};
+  Double_t masses[3] = {MASS_E, MASS_PIP, MASS_N};
 
   auto event = std::make_shared<TGenPhaseSpace>();
-  event->SetDecay(cms, 2, masses);
-  bool radiative_corrections = false;
+  event->SetDecay(cms, 3, masses);
   int n = 0;
   int total = 0;
   while (n < gen_num) {
     Double_t weight = event->Generate();
     auto Eprime = event->GetDecay(0);
-    auto Proton = event->GetDecay(1);
+    auto Pip = event->GetDecay(1);
+    auto Neut = event->GetDecay(2);
 
     double W = physics::W_calc(beam, *Eprime);
     double Q2 = physics::Q2_calc(beam, *Eprime);
@@ -64,38 +63,23 @@ int main(int argc, char *argv[]) {
 #ifdef PLOTS
       W_hist->Fill(W);
       WvsQ2->Fill(W, Q2);
+      TLorentzVector *mm = new TLorentzVector(cms);
+      *mm -= *Eprime;
+      *mm -= *Pip;
+      missMass->Fill(mm->M());
 #endif
 
       if (n++ % 1000 == 0) std::cout << "\t" << n << "\r" << std::flush;
-      myfile << "\t2 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << std::endl;
+      myfile << "\t3 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << std::endl;
       myfile << "1 0 1 11 0 0 " << Eprime->Px() << " " << Eprime->Py() << " " << Eprime->Pz() << " " << Eprime->E()
              << " " << Eprime->M() << " 0 0 0" << std::endl;
-      myfile << "2 0 1 2212 0 0 " << Proton->Px() << " " << Proton->Py() << " " << Proton->Pz() << " " << Proton->E()
-             << " " << Proton->M() << " 0 0 0" << std::endl;
-    }
-    if (radiative_corrections) {
-      std::cerr << "Not implemented yet" << std::endl;
-      exit(1);
-      // auto rad = std::make_shared<RadCorr>(energy, Eprime, 0.001);
-      // Eprime = rad->corrected();
-      double W = physics::W_calc(beam, *Eprime);
-      double Q2 = physics::Q2_calc(beam, *Eprime);
-
-#ifdef PLOTS
-      W_rad->Fill(W);
-      WvsQ2_rad->Fill(W, Q2);
-#endif
-
-      if (Q2 > q2_min && Q2 < q2_max) {
-        myfile << "\t2 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << std::endl;
-        myfile << "1 0 1 11 0 0 " << Eprime->Px() << " " << Eprime->Py() << " " << Eprime->Pz() << " " << Eprime->E()
-               << " " << Eprime->M() << " 0 0 0" << std::endl;
-        myfile << "2 0 1 2212 0 0 " << Proton->Px() << " " << Proton->Py() << " " << Proton->Pz() << " " << Proton->E()
-               << " " << Proton->M() << " 0 0 0" << std::endl;
-      }
+      myfile << "2 0 1 211 0 0 " << Pip->Px() << " " << Pip->Py() << " " << Pip->Pz() << " " << Pip->E() << " "
+             << Pip->M() << " 0 0 0" << std::endl;
+      myfile << "3 0 1 2112 0 0 " << Neut->Px() << " " << Neut->Py() << " " << Neut->Pz() << " " << Neut->E() << " "
+             << Neut->M() << " 0 0 0" << std::endl;
     }
 
-    if (total++ > 20 * gen_num) {
+    if (total++ > 5 * gen_num) {
       std::cerr << "[" << __FUNCTION__ << "] Ended with break";
       break;
     }
@@ -105,15 +89,12 @@ int main(int argc, char *argv[]) {
   std::cout << gen_num << " " << total << " " << n << std::endl;
 
 #ifdef PLOTS
-  auto f = new TFile("ElasticGen.root", "RECREATE");
+  auto f = new TFile(Form("%s.root", argv[0]), "RECREATE");
   f->cd();
   W_hist->Write();
+  missMass->Write();
+  WvsQ2->SetOption("COLZ");
   WvsQ2->Write();
-  if (radiative_corrections) {
-    W_rad->Write();
-    WvsQ2_rad->SetOption("COLZ");
-    WvsQ2_rad->Write();
-  }
   f->Write();
 #endif
 

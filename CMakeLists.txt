@@ -28,9 +28,10 @@ add_library(physics
     src/physics.cxx
 )
 
-
 set(PROGRAMS 
     ElasticGen
+    NpipGen
+    ThreePi
 )
 
 foreach(prog ${PROGRAMS})
