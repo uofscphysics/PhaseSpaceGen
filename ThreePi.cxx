@@ -36,6 +36,10 @@ int main(int argc, char *argv[]) {
 #endif
 
   std::ofstream myfile(file_name);
+  if (!myfile.is_open()) {
+    std::cerr << "Did not open file " << file_name << std::endl;
+    exit(1);
+  }
 
   TLorentzVector target(0.0, 0.0, 0.0, MASS_P);
   TLorentzVector beam(0.0, 0.0, energy, energy);
@@ -65,15 +69,19 @@ int main(int argc, char *argv[]) {
 #endif
 
       if (n++ % 1000 == 0) std::cout << "\t" << n << "\r" << std::flush;
-      myfile << "\t3 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << std::endl;
+      myfile << "\t3 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << "\n";
       myfile << "1 0 1 11 0 0 " << Eprime->Px() << " " << Eprime->Py() << " " << Eprime->Pz() << " " << Eprime->E()
-             << " " << Eprime->M() << " 0 0 0" << std::endl;
+             << " " << Eprime->M() << " 0 0 0"
+             << "\n";
       myfile << "2 0 1 211 0 0 " << Pip->Px() << " " << Pip->Py() << " " << Pip->Pz() << " " << Pip->E() << " "
-             << Pip->M() << " 0 0 0" << std::endl;
+             << Pip->M() << " 0 0 0"
+             << "\n";
       myfile << "3 0 1 -211 0 0 " << Pim->Px() << " " << Pim->Py() << " " << Pim->Pz() << " " << Pim->E() << " "
-             << Pim->M() << " 0 0 0" << std::endl;
+             << Pim->M() << " 0 0 0"
+             << "\n";
       myfile << "4 0 1 111 0 0 " << Pi0->Px() << " " << Pi0->Py() << " " << Pi0->Pz() << " " << Pi0->E() << " "
-             << Pi0->M() << " 0 0 0" << std::endl;
+             << Pi0->M() << " 0 0 0"
+             << "\n";
     }
 
     if (total++ > 5 * gen_num) {
@@ -81,12 +89,13 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
-  myfile << std::endl;
+  myfile << "\n";
   myfile.close();
   std::cout << n << " " << total << " generated " << 100 * n / total << "\% accepted " << std::endl;
 
 #ifdef PLOTS
-  auto f = new TFile(Form("%s.root", argv[0]), "RECREATE");
+  std::cout << Form("%s.root", argv[1]) << std::endl;
+  auto f = new TFile(Form("%s.root", argv[1]), "RECREATE");
   f->cd();
   W_hist->Write();
   WvsQ2->SetOption("COLZ");
