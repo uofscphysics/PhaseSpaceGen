@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
   std::cout << n << " " << total << " generated " << 100 * n / total << "\% accepted " << std::endl;
 
 #ifdef PLOTS
-  std::cout << Form("%s.root", argv[1]) << std::endl;
   auto f = new TFile(Form("%s.root", argv[1]), "RECREATE");
   f->cd();
   W_hist->Write();
