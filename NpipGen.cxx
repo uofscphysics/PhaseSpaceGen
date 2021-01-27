@@ -1,6 +1,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include "TGenPhaseSpace.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -38,6 +39,10 @@ int main(int argc, char *argv[]) {
 #endif
 
   std::ofstream myfile(file_name);
+  if (!myfile.is_open()) {
+    std::cerr << "Did not open file " << file_name << std::endl;
+    exit(1);
+  }
 
   TLorentzVector target(0.0, 0.0, 0.0, MASS_P);
   TLorentzVector beam(0.0, 0.0, energy, energy);
@@ -46,7 +51,13 @@ int main(int argc, char *argv[]) {
   //(Momentum, Energy units are Gev/C, GeV)
   Double_t masses[3] = {MASS_E, MASS_PIP, MASS_N};
 
-  auto event = std::make_shared<TGenPhaseSpace>();
+  // Get random seed to set randomness in TRandom3 for TGenPhaseSpace
+  std::mt19937_64 prng;
+  auto seed = std::random_device{}();
+  prng.seed(seed);
+  delete gRandom;
+  auto TRandSeed = gRandom = new TRandom3(prng());
+  auto event = std::make_unique<TGenPhaseSpace>();
   event->SetDecay(cms, 3, masses);
   int n = 0;
   int total = 0;

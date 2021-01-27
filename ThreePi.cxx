@@ -1,6 +1,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include "TGenPhaseSpace.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -48,11 +49,19 @@ int main(int argc, char *argv[]) {
   //(Momentum, Energy units are Gev/C, GeV)
   Double_t masses[4] = {MASS_E, MASS_PIP, MASS_PIM, MASS_PI0};
 
-  auto event = std::make_shared<TGenPhaseSpace>();
-  event->SetDecay(cms, 4, masses);
+  // Get random seed to set randomness in TRandom3 for TGenPhaseSpace
+  std::mt19937_64 prng;
+  auto seed = std::random_device{}();
+  prng.seed(seed);
+  delete gRandom;
+  auto TRandSeed = gRandom = new TRandom3(prng());
+  auto event = std::make_unique<TGenPhaseSpace>();
+
   int n = 0;
   int total = 0;
   while (n < gen_num) {
+    event->SetDecay(cms, 4, masses);
+
     Double_t weight = event->Generate();
     auto Eprime = event->GetDecay(0);
     auto Pip = event->GetDecay(1);
