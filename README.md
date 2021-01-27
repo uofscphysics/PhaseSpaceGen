@@ -5,9 +5,9 @@ Basic Elastic generator using [TGenPhaseSpace](https://root.cern.ch/doc/master/c
 ##### Build ElasticGen:
 
 ```shell
-git clone https://github.com/uofscphysics/ElasticGen.git
-mkdir -p ElasticGen/build
-cd ElasticGen/build
+git clone https://github.com/uofscphysics/PhaseSpaceGen.git
+mkdir -p PhaseSpaceGen/build
+cd PhaseSpaceGen/build
 cmake .. 
 make
 ```
