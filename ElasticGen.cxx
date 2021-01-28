@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   prng.seed(seed);
   delete gRandom;
   auto TRandSeed = gRandom = new TRandom3(prng());
-  auto event = std::make_unique<TGenPhaseSpace>();
+  auto event = std::unique_ptr<TGenPhaseSpace>(new TGenPhaseSpace());
 
   event->SetDecay(cms, 2, masses);
   bool radiative_corrections = false;
