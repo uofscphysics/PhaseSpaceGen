@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 #endif
 
       if (n++ % 1000 == 0) std::cout << "\t" << n << "\r" << std::flush;
-      myfile << "\t3 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << "\n";
+      myfile << "\t4 0.93827231 1 0 1 11 " << energy << " 2212 0 " << weight << "\n";
       myfile << "1 0 1 11 0 0 " << Eprime->Px() << " " << Eprime->Py() << " " << Eprime->Pz() << " " << Eprime->E()
              << " " << Eprime->M() << " 0 0 0"
              << "\n";
