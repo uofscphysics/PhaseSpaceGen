@@ -39,3 +39,4 @@ build
 *.dat
 *.csv
 .dccache
+.DS_Store

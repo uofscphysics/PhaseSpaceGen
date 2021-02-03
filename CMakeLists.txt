@@ -12,8 +12,9 @@ endif(PLOTS)
 
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-find_package(ROOT REQUIRED COMPONENTS RIO Net) #RooFit RooFitCore RooStats RootAuth
+find_package(ROOT REQUIRED COMPONENTS RIO Net)
 include(${ROOT_USE_FILE})
+
 
 
 set(CMAKE_MODULE_PATH
@@ -22,13 +23,13 @@ set(CMAKE_MODULE_PATH
    ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 include_directories(include)
-
+include_directories(${PROJECT_SOURCE_DIR}/external/clipp/include)
 
 add_library(physics
     src/physics.cxx
 )
 
-set(PROGRAMS 
+set(PROGRAMS
     ElasticGen
     NpipGen
     ThreePi

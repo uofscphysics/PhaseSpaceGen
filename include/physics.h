@@ -7,6 +7,7 @@
 #ifndef PHYSICS_H_GUARD
 #define PHYSICS_H_GUARD
 #include <memory>
+#include "clipp.h"
 #include "constants.h"
 
 namespace physics {
