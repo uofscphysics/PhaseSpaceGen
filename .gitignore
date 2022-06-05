@@ -40,3 +40,5 @@ build
 *.csv
 .dccache
 .DS_Store
+
+.vscode

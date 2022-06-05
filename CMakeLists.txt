@@ -33,12 +33,13 @@ set(PROGRAMS
     ElasticGen
     NpipGen
     ThreePi
+    TwoPi
 )
 
 foreach(prog ${PROGRAMS})
     get_filename_component(progname ${prog} NAME)
     string( REPLACE ".cxx" "" progname ${progname} )
-    add_executable( ${progname} ${prog} )
+    add_executable( ${progname} "${prog}.cxx" )
     target_link_libraries(${progname} PUBLIC physics ${ROOT_LIBRARIES})
     install(TARGETS ${progname} EXPORT ${PROJECT_NAME}Targets RUNTIME DESTINATION bin)
 endforeach( prog ${PROGRAMS} )
